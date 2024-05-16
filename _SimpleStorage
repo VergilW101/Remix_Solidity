@@ -1,4 +1,4 @@
-'''Solidity
+<Solidity>
 // SimpleStorage codes
 
 // SPDX-License-Identifier: MIT
@@ -49,5 +49,3 @@ contract SimpleStorage {
 
 
 }
-
-'''

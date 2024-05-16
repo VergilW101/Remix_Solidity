@@ -1,0 +1,53 @@
+'''Solidity
+// SimpleStorage codes
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0; // Claim the solidity version you wanna use. ^ means open to even newer version.
+
+// EVM: Ethererum Virtual Machine
+// Avalanche, Fantom, Polygon
+
+contract SimpleStorage {
+    // This gets initialized to zero!
+    // <- This means that this section is a comment!
+    uint256 FavoriteNumber; // "Unsigned Integer" ranges from 0 to 2^256-1.
+
+    mapping(string => uint256) public nameToFavoriteNumber;
+
+    struct People {
+        uint256 FavoriteNumber;
+        string name;
+    }
+
+
+    // uint256[] public FavoriteNumberList;
+    People[] public people;
+
+
+    // Basic data structures.
+    bool favoriteNumber = true; // Boolean only outputs true or false.
+    int256 FavotiteInt = 5; // Ranges from -2^255 to 2^255-1.
+    bytes32 FavoriteBytes = "cat"; // Will be "0x2sad156fas123d5f4a..." 1 Byte = 8 bits. 
+    string FavoriteNumberInText = "Five";
+    address MyAddress = 0x25C9fbABC3f168CCaA47acaED0341384Dd40f995; // Can be a wallet address.
+
+    function store(uint256 _FavoriteNumber) public virtual {
+        FavoriteNumber = _FavoriteNumber;
+    }
+    
+    
+    // view, pure
+    function retrieve() public view returns(uint256){
+        return FavoriteNumber;
+    }
+
+    function addperson(string memory _name, uint256 _FavoriteNumber) public {
+        // People memory newPerson = People(_FavoriteNumber, _name);
+        people.push(People(_FavoriteNumber, _name));
+        nameToFavoriteNumber[_name] = _FavoriteNumber;
+    }
+
+
+}
+
+'''

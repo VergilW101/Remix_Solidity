@@ -1,0 +1,49 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+interface IERC20 {
+    function transfer(address to, uint256 amount) external returns (bool);
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
+    function balanceOf(address account) external view returns (uint256);
+    function approve(address spender, uint256 amount) external returns (bool);
+}
+
+contract CrossChainBridge {
+    address public admin;
+    mapping(address => bool) public supportedTokens;
+    mapping(bytes32 => bool) public processedTransactions;
+
+    event Deposit(address indexed from, address indexed to, address token, uint256 amount, bytes32 transactionId);
+    event Withdrawal(address indexed from, address indexed to, address token, uint256 amount, bytes32 transactionId);
+
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin can call this function");
+        _;
+    }
+
+    constructor() {
+        admin = msg.sender;
+    }
+
+    function addSupportedToken(address token) external onlyAdmin {
+        supportedTokens[token] = true;
+    }
+
+    function deposit(address to, address token, uint256 amount) external {
+        require(supportedTokens[token], "Token not supported");
+        IERC20(token).transferFrom(msg.sender, address(this), amount);
+        bytes32 transactionId = keccak256(abi.encodePacked(msg.sender, to, token, amount));
+        processedTransactions[transactionId] = true;
+        emit Deposit(msg.sender, to, token, amount, transactionId);
+    }
+
+    function withdraw(address from, address to, address token, uint256 amount, bytes32 transactionId) external onlyAdmin {
+        require(processedTransactions[transactionId], "Transaction not processed");
+        require(supportedTokens[token], "Token not supported");
+        require(IERC20(token).balanceOf(address(this)) >= amount, "Insufficient balance");
+
+        processedTransactions[transactionId] = false;
+        IERC20(token).transfer(to, amount);
+        emit Withdrawal(from, to, token, amount, transactionId);
+    }
+}
